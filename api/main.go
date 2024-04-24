@@ -2,16 +2,17 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"vaultfitness.io/api/common"
 	"vaultfitness.io/api/movements"
 )
 
 func main() {
-	// err := godotenv.Load()
+	err := godotenv.Load()
 
-	// if err != nil {
-	// 	panic("Error loading .env file")
-	// }
+	if err != nil {
+		panic("Error loading .env file")
+	}
 
 	r := gin.Default()
 
