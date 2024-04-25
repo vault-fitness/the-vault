@@ -13,13 +13,12 @@ func main() {
 	if err != nil {
 		panic("Error loading .env file")
 	}
+	common.Init()
 
 	r := gin.Default()
 
-	v1 := r.Group("/api/v1")
+	v1 := r.Group("/v1")
 	movements.MovementsRegister(v1.Group("/movements"))
 
 	r.Run()
-
-	common.Init()
 }
