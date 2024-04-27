@@ -18,7 +18,7 @@ func main() {
 	r := gin.Default()
 
 	v1 := r.Group("/v1")
-	movements.MovementsRegister(v1.Group("/movements"))
+	movements.MovementsRegister(v1.Group("/movement"))
 
 	r.Run()
 }

@@ -1,6 +1,7 @@
 package movements
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,8 +10,8 @@ import (
 )
 
 func MovementsRegister(router *gin.RouterGroup) {
-
 	router.GET("/type", MovementTypesList)
+	router.POST("/type", CreateMovementType)
 }
 
 type MovementType struct {
@@ -25,6 +26,32 @@ type Movement struct {
 	Abbreviation   string `gorm:"unique; not null"`
 	ImageUrl       string
 	MovementTypeID uint
+}
+
+type createMovementTypeRequest struct {
+	Name         string
+	Abbreviation string
+}
+
+func CreateMovementType(c *gin.Context) {
+	db := common.GetDB()
+
+	var r createMovementTypeRequest
+
+	if err := c.BindJSON(&r); err != nil {
+		fmt.Errorf("Unable to handle request")
+	}
+
+	mt := MovementType{
+		Name:         r.Name,
+		Abbreviation: r.Abbreviation,
+	}
+
+	db.Create(&mt)
+
+	fmt.Printf("Created movement type %d", mt.ID)
+
+	c.JSON(http.StatusOK, mt)
 }
 
 func MovementTypesList(c *gin.Context) {
