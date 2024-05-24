@@ -5,27 +5,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"vaultfitness.io/api/common"
 )
 
 func MovementsRegister(router *gin.RouterGroup) {
 	router.GET("/type", MovementTypesList)
 	router.POST("/type", CreateMovementType)
-}
-
-type MovementType struct {
-	gorm.Model
-	Name         string `gorm:"unique; not null"`
-	Abbreviation string `gorm:"unique; not null"`
-}
-
-type Movement struct {
-	gorm.Model
-	Name           string `gorm:"unique; not null"`
-	Abbreviation   string `gorm:"unique; not null"`
-	ImageUrl       string
-	MovementTypeID uint
 }
 
 type createMovementTypeRequest struct {
@@ -38,8 +23,13 @@ func CreateMovementType(c *gin.Context) {
 
 	var r createMovementTypeRequest
 
-	if err := c.BindJSON(&r); err != nil {
-		fmt.Errorf("Unable to handle request")
+	var existingMovementType []MovementType
+	db.Raw("SELECT id, name, abbreviation FROM movement_types WHERE name = $1 OR abbreviation = $2", r.Name, r.Abbreviation).Scan(&existingMovementType)
+
+	if len(existingMovementType) > 0 {
+		fmt.Println("Found movement already")
+		c.String(http.StatusBadRequest, "Movement Type Already Exists")
+		return
 	}
 
 	mt := MovementType{
